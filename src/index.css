@@ -52,3 +52,30 @@ code {
   height: 45px;
   font-size: 1rem;
 }
+
+/* Update movie item styles */
+
+/* Hover effect */
+.movie-item:hover {
+  background-color: #f8f9fa; /* Light grey background on hover */
+  transform: scale(1.02); /* Slight zoom effect for better interactivity */
+}
+
+/* Style for selected item */
+.movie-item.selected {
+  background-color: #28a745; /* Green background for selected movie */
+  color: white; /* White text for contrast */
+  border: 2px solid #218838; /* Darker green border */
+}
+
+/* Style for hover effect on hover but not selected */
+.movie-item.hovered {
+  background-color: #e9ecef; /* Slightly darker grey background for hovered item */
+}
+
+/* Style for the rating stars */
+.movie-item.selected .star-rating {
+  color: #f0e68c; /* Light yellow color for the rating stars */
+}
+
+

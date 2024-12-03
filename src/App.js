@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { fetchMovies } from "./api/api"; // Import the fetchMovies function
 import MovieList from "./components/MovieList";
 import MovieDetails from "./components/MovieDetails";
 import FilterSortControls from "./components/FilterSortControls";
@@ -11,51 +11,6 @@ const App = () => {
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const fetchMovies = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get("https://swapi.dev/api/films/?format=json");
-      const starWarsMovies = response.data.results;
-
-      // Fetch OMDb data for each movie
-      const omdbPromises = starWarsMovies.map(async (movie) => {
-        const omdbResponse = await axios.get(
-          `https://www.omdbapi.com/?t=${encodeURIComponent(
-            movie.title
-          )}&apikey=${process.env.REACT_APP_OMDB_API_KEY}`
-        );
-        return {
-          ...movie,
-          poster: omdbResponse.data.Poster,
-          ratings: omdbResponse.data.Ratings,
-          averageRating: calculateAverageRating(omdbResponse.data.Ratings),
-        };
-      });
-
-      const moviesWithOmdbData = await Promise.all(omdbPromises);
-      setMovies(moviesWithOmdbData);
-      setFilteredMovies(moviesWithOmdbData);
-    } catch (error) {
-      setError("Failed to fetch movie list. Please try again later.");
-      console.error("Error fetching movie data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const calculateAverageRating = (ratings) => {
-    if (!ratings) return "N/A";
-    const validRatings = ratings.map((r) => {
-      const value = r.Value.includes("/")
-        ? parseFloat(r.Value.split("/")[0])
-        : parseFloat(r.Value);
-      return value / 10;
-    });
-    const average = validRatings.reduce((sum, r) => sum + r, 0) / validRatings.length;
-    return (average * 10).toFixed(1);
-  };
 
   const handleSearch = (term) => {
     setSearchTerm(term);
@@ -75,7 +30,22 @@ const App = () => {
   };
 
   useEffect(() => {
-    fetchMovies();
+    const getMovies = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const fetchedMovies = await fetchMovies();
+        setMovies(fetchedMovies);
+        setFilteredMovies(fetchedMovies);
+      } catch (err) {
+        setError("Failed to fetch movie list. Please try again later.");
+        console.error("Error fetching movie data:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    getMovies();
   }, []);
 
   return (
@@ -108,14 +78,14 @@ const App = () => {
         </div>
       )}
       {!loading && !error && filteredMovies.length > 0 && (
-      <div className="row">
-        <div className="col-md-6">
-          <MovieList movies={filteredMovies} onSelect={setSelectedMovie} />
+        <div className="row">
+          <div className="col-md-6">
+            <MovieList movies={filteredMovies} onSelect={setSelectedMovie} selectedMovie={selectedMovie} />
+          </div>
+          <div className="col-md-6">
+            <MovieDetails movie={selectedMovie} />
+          </div>
         </div>
-        <div className="col-md-6">
-          <MovieDetails movie={selectedMovie} />
-        </div>
-      </div>
       )}
     </div>
   );
