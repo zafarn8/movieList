@@ -1,0 +1,35 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+
+# Dependency directories
+/.pnp
+.pnp.js
+
+
+# Build directories
+/build/
+dist/
+
+# Coverage directory for testing
+coverage/
+
+# IDE and editor settings
+.vscode/
+.idea/
+*.swp
+
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# macOS and Linux files
+*.~undo-tree~
